@@ -1,6 +1,8 @@
 {
   "name": "chrometabmagic",
   "version": "0.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "react": "~0.12.1"
+  },
   "devDependencies": {}
 }
