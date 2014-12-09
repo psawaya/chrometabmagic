@@ -56,7 +56,7 @@ var SearchBox = React.createClass({
       React.createElement('div', {}, [
         React.createElement('input', {
           type: 'search',
-          className: "form-control"
+          className: 'form-control'
         }, [
         ])
       ]),
