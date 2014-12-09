@@ -6,7 +6,19 @@ var React = window.React;
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
   onClick: function() {
-    chrome.tabs.update(this.props.id, {active: true});
+    var focusTab = (function () {
+      chrome.tabs.update(this.props.id, {active: true});
+    }).bind(this);
+    chrome.windows.getLastFocused(function(focusedWindow){
+      if (focusedWindow.id !== this.props.windowId) {
+        chrome.windows.update(this.props.windowId, {focused: true}, function() {
+          focusTab();
+        });
+      }
+      else {
+        focusTab();
+      }
+    }.bind(this));
   },
   render: function() {
     return React.createElement('li', {
@@ -69,7 +81,6 @@ var TabMagic = React.createClass({
         items: tabs,
         loaded: true
       });
-      // console.log(tabs);
     }.bind(this));
   },
   render: function() {
