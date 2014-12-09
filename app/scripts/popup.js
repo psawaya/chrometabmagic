@@ -28,7 +28,7 @@ var SearchResultItems = React.createClass({
   render: function() {
     return React.createElement('ul', {
       className: 'list-group'
-    }, this.props.items.map(function(item) {
+    }, this.props.items.filter(this.props.showItem).map(function(item) {
       var itemPlusKey = item;
       // React needs this to keep track of lists.
       itemPlusKey.key = item.id;
@@ -37,19 +37,40 @@ var SearchResultItems = React.createClass({
   }
 });
 
+var SearchBoxInput = React.createClass({
+  displayName: 'SearchBoxInput',
+  render: function() {
+    return React.createElement('input', {
+      type: 'search',
+      className: 'form-control',
+      onChange: this.props.handleChange
+    }, []);
+  }
+});
+
 var SearchBox = React.createClass({
   displayName: 'SearchBox',
+  getInitialState: function() {
+    return {
+      filterText: ''
+    };
+  },
+  filterTextChange: function(evt) {
+    this.setState({
+      filterText: evt.target.value
+    });
+  },
+  showItem: function(item) {
+    return item.title.indexOf(this.state.filterText) >= 0 ||
+           item.url.indexOf(this.state.filterText) >= 0;
+  },
   render: function() {
     return React.createElement('div', {}, [
       React.createElement('div', {}, [
-        React.createElement('input', {
-          type: 'search',
-          className: 'form-control'
-        }, [
-        ])
+        React.createElement(SearchBoxInput, {handleChange: this.filterTextChange}, [])
       ]),
       React.createElement('div', {}, [
-        React.createElement(SearchResultItems, {items: this.props.items}, [])
+        React.createElement(SearchResultItems, {items: this.props.items, showItem: this.showItem}, [])
       ])
     ]);
   }
