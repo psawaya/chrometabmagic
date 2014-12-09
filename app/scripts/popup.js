@@ -51,12 +51,16 @@ var SearchResultItems = React.createClass({
 
 var SearchBox = React.createClass({
   displayName: 'SearchBox',
+  componentDidMount: function() {
+    this.refs['inputBox'].getDOMNode().focus();
+  },
   render: function() {
     return React.createElement('div', {}, [
       React.createElement('div', {}, [
         React.createElement('input', {
           type: 'search',
-          className: 'form-control'
+          className: 'form-control',
+          ref: 'inputBox'
         }, [
         ])
       ]),
