@@ -6,20 +6,39 @@ var React = window.React;
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
   onClick: function() {
-    chrome.tabs.update(this.props.id, {active: true});
+    var focusTab = function () {
+      chrome.tabs.update(this.props.item.id, {active: true});
+    }.bind(this);
+    chrome.windows.getLastFocused(function(focusedWindow){
+      if (focusedWindow.id !== this.props.item.windowId) {
+        chrome.windows.update(this.props.item.windowId, {focused: true}, function() {
+          focusTab();
+        });
+      }
+      else {
+        focusTab();
+      }
+    }.bind(this));
   },
   render: function() {
-    return React.createElement('li', {
-      className: 'list-group-item',
+    console.log("item render", this.props);
+    var cx = React.addons.classSet;
+    var ret = React.createElement('li', {
+      className: cx({
+        'list-group-item': true,
+        'active': this.props.focused
+      }),
       onClick: this.onClick
     }, [
       React.createElement('img', {
-        src: this.props.favIconUrl,
+        src: this.props.item.favIconUrl,
         width: 16,
         height: 16
       }),
-      React.createElement('span', {}, [this.props.title])
+      React.createElement('span', {}, [this.props.item.title])
     ]);
+    console.log("did render");
+    return ret;
   }
 });
 
@@ -28,22 +47,29 @@ var SearchResultItems = React.createClass({
   render: function() {
     return React.createElement('ul', {
       className: 'list-group'
-    }, this.props.items.filter(this.props.showItem).map(function(item) {
-      var itemPlusKey = item;
-      // React needs this to keep track of lists.
-      itemPlusKey.key = item.id;
-      return React.createElement(SearchResultItem, itemPlusKey, []);
-    }));
+    }, this.props.items.filter(this.props.showItem).map(function(item, itemIndex) {
+      console.log("items props", this.props);
+      return React.createElement(SearchResultItem, {
+        item: item,
+        key: item.id,
+        focused: (itemIndex === this.props.focusedIndex)
+      });
+    }.bind(this)));
   }
 });
 
 var SearchBoxInput = React.createClass({
   displayName: 'SearchBoxInput',
+  componentDidMount: function() {
+    this.refs['inputBox'].getDOMNode().focus();
+  },
   render: function() {
     return React.createElement('input', {
       type: 'search',
       className: 'form-control',
-      onChange: this.props.handleChange
+      ref: 'inputBox',
+      onChange: this.props.handleChange,
+      onKeyDown: this.props.handleKeyDown
     }, []);
   }
 });
@@ -52,7 +78,8 @@ var SearchBox = React.createClass({
   displayName: 'SearchBox',
   getInitialState: function() {
     return {
-      filterText: ''
+      filterText: '',
+      focusedIndex: 0
     };
   },
   filterTextChange: function(evt) {
@@ -64,13 +91,42 @@ var SearchBox = React.createClass({
     return item.title.indexOf(this.state.filterText) >= 0 ||
            item.url.indexOf(this.state.filterText) >= 0;
   },
+  onKeyDown: function(e) {
+    if (e.key === 'ArrowDown') {
+      if (this.state.focusedIndex === this.props.items.length-1) {
+        return;
+      }
+      else {
+        this.setState ({
+          focusedIndex: this.state.focusedIndex+1
+        });
+      }
+    }
+    if (e.key === 'ArrowUp') {
+      if (this.state.focusedIndex === 0) {
+        return;
+      }
+      else {
+        this.setState ({
+          focusedIndex: this.state.focusedIndex-1
+        });
+      }
+    }
+  },
   render: function() {
     return React.createElement('div', {}, [
       React.createElement('div', {}, [
-        React.createElement(SearchBoxInput, {handleChange: this.filterTextChange}, [])
+        React.createElement(SearchBoxInput, {
+          handleChange: this.filterTextChange,
+          handleKeyDown: this.onKeyDown
+        }, [])
       ]),
       React.createElement('div', {}, [
-        React.createElement(SearchResultItems, {items: this.props.items, showItem: this.showItem}, [])
+        React.createElement(SearchResultItems, {
+          items: this.props.items,
+          focusedIndex: this.state.focusedIndex,
+          showItem: this.showItem
+        }, [])
       ])
     ]);
   }
@@ -90,7 +146,6 @@ var TabMagic = React.createClass({
         items: tabs,
         loaded: true
       });
-      // console.log(tabs);
     }.bind(this));
   },
   render: function() {
