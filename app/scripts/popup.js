@@ -5,8 +5,14 @@ var React = window.React;
 
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
+  onClick: function() {
+    chrome.tabs.update(this.props.id, {active: true});
+  },
   render: function() {
-    return React.createElement('div', {}, [
+    return React.createElement('li', {
+      className: 'list-group-item',
+      onClick: this.onClick
+    }, [
       React.createElement('img', {
         src: this.props.favIconUrl,
         width: 16,
@@ -20,7 +26,9 @@ var SearchResultItem = React.createClass({
 var SearchResultItems = React.createClass({
   displayName: 'SearchResultItems',
   render: function() {
-    return React.createElement('div', {}, this.props.items.map(function(item) {
+    return React.createElement('ul', {
+      className: 'list-group'
+    }, this.props.items.map(function(item) {
       var itemPlusKey = item;
       // React needs this to keep track of lists.
       itemPlusKey.key = item.id;
@@ -35,7 +43,8 @@ var SearchBox = React.createClass({
     return React.createElement('div', {}, [
       React.createElement('div', {}, [
         React.createElement('input', {
-          type: 'input'
+          type: 'search',
+          className: "form-control"
         }, [
         ])
       ]),
