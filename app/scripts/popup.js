@@ -21,7 +21,7 @@ var SearchResultItem = React.createClass({
     }.bind(this));
   },
   render: function() {
-    console.log("item render", this.props);
+    console.log('item render', this.props);
     var cx = React.addons.classSet;
     var ret = React.createElement('li', {
       className: cx({
@@ -37,7 +37,7 @@ var SearchResultItem = React.createClass({
       }),
       React.createElement('span', {}, [this.props.item.title])
     ]);
-    console.log("did render");
+    console.log('did render');
     return ret;
   }
 });
@@ -48,7 +48,7 @@ var SearchResultItems = React.createClass({
     return React.createElement('ul', {
       className: 'list-group'
     }, this.props.items.filter(this.props.showItem).map(function(item, itemIndex) {
-      console.log("items props", this.props);
+      console.log('items props', this.props);
       return React.createElement(SearchResultItem, {
         item: item,
         key: item.id,
@@ -61,7 +61,7 @@ var SearchResultItems = React.createClass({
 var SearchBoxInput = React.createClass({
   displayName: 'SearchBoxInput',
   componentDidMount: function() {
-    this.refs['inputBox'].getDOMNode().focus();
+    this.refs.inputBox.getDOMNode().focus();
   },
   render: function() {
     return React.createElement('input', {
