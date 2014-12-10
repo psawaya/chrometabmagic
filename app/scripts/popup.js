@@ -114,6 +114,10 @@ var SearchBox = React.createClass({
         });
       }
     }
+    if (e.key === 'Enter') {
+      var selectedItem = this.props.items[this.state.focusedIndex];
+      switchToTab(selectedItem);
+    }
   },
   render: function() {
     return React.createElement('div', {}, [
