@@ -31,5 +31,16 @@
         "history",
         "http://*/*",
         "https://*/*"
-    ]
+    ],
+    "commands": {
+      "_execute_browser_action": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+U",
+          "windows": "Ctrl+Shift+U",
+          "mac": "Command+Shift+U",
+          "chromeos": "Ctrl+Shift+U",
+          "linux": "Ctrl+Shift+U"
+        }
+      }
+    }
 }
