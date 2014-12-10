@@ -21,7 +21,6 @@ var SearchResultItem = React.createClass({
     }.bind(this));
   },
   render: function() {
-    console.log('item render', this.props);
     var cx = React.addons.classSet;
     var ret = React.createElement('li', {
       className: cx({
@@ -37,7 +36,6 @@ var SearchResultItem = React.createClass({
       }),
       React.createElement('span', {}, [this.props.item.title])
     ]);
-    console.log('did render');
     return ret;
   }
 });
@@ -48,7 +46,6 @@ var SearchResultItems = React.createClass({
     return React.createElement('ul', {
       className: 'list-group'
     }, this.props.items.filter(this.props.showItem).map(function(item, itemIndex) {
-      console.log('items props', this.props);
       return React.createElement(SearchResultItem, {
         item: item,
         key: item.id,
@@ -159,5 +156,3 @@ var TabMagic = React.createClass({
 });
 
 React.render(React.createElement(TabMagic, {}, []), document.getElementById('main_container'));
-
-// console.log('\'Allo \'Allo! Popup');
