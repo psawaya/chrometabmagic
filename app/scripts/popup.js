@@ -25,7 +25,6 @@ var SearchResultItem = React.createClass({
     switchToTab(this.props.item);
   },
   render: function() {
-    console.log('item render', this.props);
     var cx = React.addons.classSet;
     var ret = React.createElement('li', {
       className: cx({
@@ -37,11 +36,11 @@ var SearchResultItem = React.createClass({
       React.createElement('img', {
         src: this.props.item.favIconUrl,
         width: 16,
-        height: 16
+        height: 16,
+        key: "image"
       }),
-      React.createElement('span', {}, [this.props.item.title])
+      React.createElement('span', {key: "title"}, this.props.item.title)
     ]);
-    console.log('did render');
     return ret;
   }
 });
@@ -52,7 +51,6 @@ var SearchResultItems = React.createClass({
     return React.createElement('ul', {
       className: 'list-group'
     }, this.props.items.filter(this.props.showItem).map(function(item, itemIndex) {
-      console.log('items props', this.props);
       return React.createElement(SearchResultItem, {
         item: item,
         key: item.id,
@@ -119,19 +117,19 @@ var SearchBox = React.createClass({
   },
   render: function() {
     return React.createElement('div', {}, [
-      React.createElement('div', {}, [
+      React.createElement('div', {key: "input"},
         React.createElement(SearchBoxInput, {
           handleChange: this.filterTextChange,
           handleKeyDown: this.onKeyDown
-        }, [])
-      ]),
-      React.createElement('div', {}, [
+        })
+      ),
+      React.createElement('div', {key: "items"},
         React.createElement(SearchResultItems, {
           items: this.props.items,
           focusedIndex: this.state.focusedIndex,
           showItem: this.showItem
-        }, [])
-      ])
+        })
+      )
     ]);
   }
 });
@@ -163,5 +161,3 @@ var TabMagic = React.createClass({
 });
 
 React.render(React.createElement(TabMagic, {}, []), document.getElementById('main_container'));
-
-// console.log('\'Allo \'Allo! Popup');
