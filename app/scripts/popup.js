@@ -3,22 +3,26 @@
 // To appease jshint.
 var React = window.React;
 
+function switchToTab(tabInfo) {
+  var focusTab = function() {
+    chrome.tabs.update(tabInfo.id, {active: true});
+  };
+  chrome.windows.getLastFocused(function(focusedWindow) {
+    if (focusedWindow.id !== tabInfo.windowId) {
+      chrome.windows.update(tabInfo.windowId, {focused: true}, function() {
+        focusTab();
+      });
+    }
+    else {
+      focusTab();
+    }
+  });
+}
+
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
   onClick: function() {
-    var focusTab = function () {
-      chrome.tabs.update(this.props.item.id, {active: true});
-    }.bind(this);
-    chrome.windows.getLastFocused(function(focusedWindow){
-      if (focusedWindow.id !== this.props.item.windowId) {
-        chrome.windows.update(this.props.item.windowId, {focused: true}, function() {
-          focusTab();
-        });
-      }
-      else {
-        focusTab();
-      }
-    }.bind(this));
+    switchToTab(this.props.item);
   },
   render: function() {
     console.log('item render', this.props);
