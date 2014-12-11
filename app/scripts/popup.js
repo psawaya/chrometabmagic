@@ -37,9 +37,9 @@ var SearchResultItem = React.createClass({
         src: this.props.item.favIconUrl,
         width: 16,
         height: 16,
-        key: "image"
+        key: 'image'
       }),
-      React.createElement('span', {key: "title"}, this.props.item.title)
+      React.createElement('span', {key: 'title'}, this.props.item.title)
     ]);
     return ret;
   }
@@ -118,16 +118,19 @@ var SearchBox = React.createClass({
       var selectedItem = this.props.items[this.state.focusedIndex];
       switchToTab(selectedItem);
     }
+    if (e.key === 'Escape') {
+      window.close();
+    }
   },
   render: function() {
     return React.createElement('div', {}, [
-      React.createElement('div', {key: "input"},
+      React.createElement('div', {key: 'input'},
         React.createElement(SearchBoxInput, {
           handleChange: this.filterTextChange,
           handleKeyDown: this.onKeyDown
         })
       ),
-      React.createElement('div', {key: "items"},
+      React.createElement('div', {key: 'items'},
         React.createElement(SearchResultItems, {
           items: this.props.items,
           focusedIndex: this.state.focusedIndex,
