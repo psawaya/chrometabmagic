@@ -1,4 +1,16 @@
 body {
   padding: 20px;
   width: 500px;
+  height: 600px;
+}
+
+.search-box {
+  position:fixed;
+}
+
+.tab-results {
+  position:relative;
+  overflow:scroll;
+  width: 430px;
+  height: 520px;
 }

@@ -3,7 +3,6 @@
 // To appease jshint.
 var React = window.React;
 var $ = window.$;
-var _ = window.$;
 
 function switchToTab(tabInfo) {
   var focusTab = function() {
@@ -93,10 +92,11 @@ var SearchResultItems = React.createClass({
     }
   },
   openFocused: function() {
-    var selectedItem = _.find(this.props.items, function(item) {
-      return item.id === this.state.focusedID;
-    }.bind(this));
-    switchToTab(selectedItem);
+    var focusedIdx = this.getFocusedItemIdx();
+    if (focusedIdx === null) {
+      return;
+    }
+    switchToTab(this.props.items[focusedIdx]);
   },
   selectItemByID: function(itemID) {
     // After this.state.focusedID is updated, scroll the pane to the
@@ -107,15 +107,17 @@ var SearchResultItems = React.createClass({
   },
   scrollToFocused: function() {
     // Stop any current animations
-    $('html, body').stop();
+    $(this.getDOMNode()).stop();
     // Animate the scroll to the focused element
-    $('html, body').animate({
-      scrollTop: $(this.refs.focusedElement.getDOMNode()).offset().top
+    var scrollOffset = $(this.getDOMNode()).scrollTop();
+    var scrollAmount = $(this.refs.focusedElement.getDOMNode()).position().top + scrollOffset;
+    $(this.getDOMNode()).animate({
+      scrollTop: scrollAmount
     }, 100);
   },
   render: function() {
     return React.createElement('ul', {
-      className: 'list-group'
+      className: 'list-group tab-results'
     }, this.props.items.map(function(item) {
       var itemProps = {
         item: item,
