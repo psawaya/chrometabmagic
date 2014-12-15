@@ -188,7 +188,8 @@ var SearchBox = React.createClass({
       ),
         React.createElement(SearchResultItems, {
           items: this.props.items.filter(this.showItem),
-          ref: 'items'
+          ref: 'items',
+          key: 'items'
         })
       ]);
   }
