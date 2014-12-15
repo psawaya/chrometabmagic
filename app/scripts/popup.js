@@ -54,11 +54,21 @@ var SearchResultItems = React.createClass({
       focusedID: null
     };
   },
+  getFocusedItemIdx: function() {
+    for (var idx = 0; idx < this.props.items.length; idx++) {
+      if (this.props.items[idx].id === this.state.focusedID) {
+        return idx;
+      }
+    }
+    return null;
+  },
   // `dir` is 1 if we want to move the focused element down, and -1 if we want
   // to move it up.
   moveFocused: function(dir) {
-    // If we haven't selected anything...
-    if (this.state.focusedID === null) {
+    var focusedIdx = this.getFocusedItemIdx();
+    // If we haven't focused anything, or if the item we've focused is no
+    // longer in list.
+    if (this.state.focusedID === null || focusedIdx === null) {
       // ...and the direction is down, the first item is what we want.
       if (dir === 1) {
         this.selectItemByID(this.props.items[0].id);
@@ -69,24 +79,17 @@ var SearchResultItems = React.createClass({
       }
       return;
     }
-
-    var selectedIdx = 0;
-    for (; selectedIdx < this.props.items.length; selectedIdx++) {
-      if (this.props.items[selectedIdx].id === this.state.focusedID) {
-        break;
-      }
-    }
     if (dir === 1) {
-      if (selectedIdx >= this.props.items.length-1) {
+      if (focusedIdx >= this.props.items.length-1) {
         return;
       }
-      this.selectItemByID(this.props.items[selectedIdx+1].id);
+      this.selectItemByID(this.props.items[focusedIdx+1].id);
     }
     else if (dir === -1) {
-      if (selectedIdx === 0) {
+      if (focusedIdx === 0) {
         return;
       }
-      this.selectItemByID(this.props.items[selectedIdx-1].id);
+      this.selectItemByID(this.props.items[focusedIdx-1].id);
     }
   },
   openFocused: function() {
