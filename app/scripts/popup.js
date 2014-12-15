@@ -152,8 +152,7 @@ var SearchBox = React.createClass({
   displayName: 'SearchBox',
   getInitialState: function() {
     return {
-      filterText: '',
-      focusedIndex: 0
+      filterText: ''
     };
   },
   filterTextChange: function(evt) {
