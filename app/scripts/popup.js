@@ -2,6 +2,8 @@
 
 // To appease jshint.
 var React = window.React;
+var $ = window.$;
+var _ = window.$;
 
 function switchToTab(tabInfo) {
   var focusTab = function() {
@@ -47,15 +49,80 @@ var SearchResultItem = React.createClass({
 
 var SearchResultItems = React.createClass({
   displayName: 'SearchResultItems',
+  getInitialState: function() {
+    return {
+      focusedID: null
+    };
+  },
+  // `dir` is 1 if we want to move the focused element down, and -1 if we want
+  // to move it up.
+  moveFocused: function(dir) {
+    // If we haven't selected anything...
+    if (this.state.focusedID === null) {
+      // ...and the direction is down, the first item is what we want.
+      if (dir === 1) {
+        this.selectItemByID(this.props.items[0].id);
+      }
+      // ...and the direction is up, the first item is what we want.
+      else if (dir === -1) {
+        this.selectItemByID(this.props.items[this.props.items.length-1].id);
+      }
+      return;
+    }
+
+    var selectedIdx = 0;
+    for (; selectedIdx < this.props.items.length; selectedIdx++) {
+      if (this.props.items[selectedIdx].id === this.state.focusedID) {
+        break;
+      }
+    }
+    if (dir === 1) {
+      if (selectedIdx >= this.props.items.length-1) {
+        return;
+      }
+      this.selectItemByID(this.props.items[selectedIdx+1].id);
+    }
+    else if (dir === -1) {
+      if (selectedIdx === 0) {
+        return;
+      }
+      this.selectItemByID(this.props.items[selectedIdx-1].id);
+    }
+  },
+  openFocused: function() {
+    var selectedItem = _.find(this.props.items, function(item) {
+      return item.id === this.state.focusedID;
+    }.bind(this));
+    switchToTab(selectedItem);
+  },
+  selectItemByID: function(itemID) {
+    // After this.state.focusedID is updated, scroll the pane to the
+    // corresponding element.
+    this.setState({
+      focusedID: itemID
+    }, this.scrollToFocused);
+  },
+  scrollToFocused: function() {
+    // Stop any current animations
+    $('html, body').stop();
+    // Animate the scroll to the focused element
+    $('html, body').animate({
+      scrollTop: $(this.refs.focusedElement.getDOMNode()).offset().top
+    }, 100);
+  },
   render: function() {
     return React.createElement('ul', {
       className: 'list-group'
-    }, this.props.items.filter(this.props.showItem).map(function(item, itemIndex) {
-      return React.createElement(SearchResultItem, {
+    }, this.props.items.map(function(item) {
+      var itemProps = {
         item: item,
         key: item.id,
-        focused: (itemIndex === this.props.focusedIndex)
-      });
+        focused: this.state.focusedID === item.id
+      };
+      if (itemProps.focused) {
+        itemProps.ref = 'focusedElement';
+      }
+      return React.createElement(SearchResultItem, itemProps);
     }.bind(this)));
   }
 });
@@ -95,28 +162,13 @@ var SearchBox = React.createClass({
   },
   onKeyDown: function(e) {
     if (e.key === 'ArrowDown') {
-      if (this.state.focusedIndex === this.props.items.length-1) {
-        return;
-      }
-      else {
-        this.setState ({
-          focusedIndex: this.state.focusedIndex+1
-        });
-      }
+      this.refs.items.moveFocused(1);
     }
     if (e.key === 'ArrowUp') {
-      if (this.state.focusedIndex === 0) {
-        return;
-      }
-      else {
-        this.setState ({
-          focusedIndex: this.state.focusedIndex-1
-        });
-      }
+      this.refs.items.moveFocused(-1);
     }
     if (e.key === 'Enter') {
-      var selectedItem = this.props.items[this.state.focusedIndex];
-      switchToTab(selectedItem);
+      this.refs.items.openFocused();
     }
     if (e.key === 'Escape') {
       window.close();
@@ -130,14 +182,11 @@ var SearchBox = React.createClass({
           handleKeyDown: this.onKeyDown
         })
       ),
-      React.createElement('div', {key: 'items'},
         React.createElement(SearchResultItems, {
-          items: this.props.items,
-          focusedIndex: this.state.focusedIndex,
-          showItem: this.showItem
+          items: this.props.items.filter(this.showItem),
+          ref: 'items'
         })
-      )
-    ]);
+      ]);
   }
 });
 

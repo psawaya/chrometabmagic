@@ -1,6 +1,6 @@
 {
     "name": "__MSG_appName__",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "manifest_version": 2,
     "description": "__MSG_appDescription__",
     "icons": {
@@ -33,14 +33,14 @@
         "https://*/*"
     ],
     "commands": {
-      "_execute_browser_action": {
-        "suggested_key": {
-          "default": "Ctrl+Shift+U",
-          "windows": "Ctrl+Shift+U",
-          "mac": "Command+Shift+U",
-          "chromeos": "Ctrl+Shift+U",
-          "linux": "Ctrl+Shift+U"
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+U",
+                "windows": "Ctrl+Shift+U",
+                "mac": "Command+Shift+U",
+                "chromeos": "Ctrl+Shift+U",
+                "linux": "Ctrl+Shift+U"
+            }
         }
-      }
     }
 }
