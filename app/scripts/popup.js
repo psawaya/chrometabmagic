@@ -206,8 +206,9 @@ var SearchBox = React.createClass({
     }, this.ensureItemSelected);
   },
   showItem: function(item) {
-    return item.title.indexOf(this.state.filterText) >= 0 ||
-           item.url.indexOf(this.state.filterText) >= 0;
+    var lowerCaseFilterText = this.state.filterText.toLowerCase();
+    return item.title.toLowerCase().indexOf(lowerCaseFilterText) >= 0 ||
+           item.url.toLowerCase().indexOf(lowerCaseFilterText) >= 0;
   },
   onKeyDown: function(e) {
     if (e.key === 'ArrowDown') {
