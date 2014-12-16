@@ -155,10 +155,17 @@ var SearchBox = React.createClass({
       filterText: ''
     };
   },
+  ensureItemSelected: function() {
+    if (this.refs.items.getFocusedItemIdx() === null) {
+      if (this.refs.items.props.items.length > 0) {
+        this.refs.items.selectItemByID(this.refs.items.props.items[0].id);
+      }
+    }
+  },
   filterTextChange: function(evt) {
     this.setState({
       filterText: evt.target.value
-    });
+    }, this.ensureItemSelected);
   },
   showItem: function(item) {
     return item.title.indexOf(this.state.filterText) >= 0 ||
