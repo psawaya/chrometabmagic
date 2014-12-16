@@ -1,7 +1,12 @@
 body {
-  padding: 20px;
+  padding: 0px;
   width: 500px;
   height: 600px;
+}
+
+#main_container {
+  padding: 0;
+  margin: 0;
 }
 
 .search-box {
@@ -10,7 +15,20 @@ body {
 
 .tab-results {
   position:relative;
-  overflow:scroll;
-  width: 430px;
-  height: 520px;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  width: 500px;
+  height: 540px;
+}
+
+.tab-result-item img {
+  float: left;
+  margin: 2px 10px;
+}
+
+.tab-result-item span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

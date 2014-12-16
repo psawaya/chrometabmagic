@@ -31,7 +31,7 @@ function createOrGetBookmarkFolder() {
     }
     else {
       chrome.bookmarks.create({
-        title: "Quicksaved Tabs"
+        title: 'Quicksaved Tabs'
       }, function(folder) {
         bookmarkFolderID = folder.id;
         chrome.storage.sync.set({bookmarkFolderID: folder.id});
@@ -52,6 +52,7 @@ var SearchResultItem = React.createClass({
     var ret = React.createElement('li', {
       className: cx({
         'list-group-item': true,
+        'tab-result-item': true,
         'active': this.props.focused
       }),
       onClick: this.onClick
@@ -270,7 +271,7 @@ var TabMagic = React.createClass({
   loadTabs: function(withoutIDs) {
     chrome.tabs.query({}, function(tabs) {
       withoutIDs = withoutIDs || [];
-      var res = tabs.filter(function(tab) { return withoutIDs.indexOf(tab.id) !== -1 });
+      var res = tabs.filter(function(tab) { return withoutIDs.indexOf(tab.id) !== -1; });
       if (res.length !== 0) {
         setTimeout(this.loadTabs.bind(this, withoutIDs), 50);
         return;
