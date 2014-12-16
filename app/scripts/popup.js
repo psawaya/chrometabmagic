@@ -4,6 +4,10 @@
 var React = window.React;
 var $ = window.$;
 
+var TabMagicMain = null;
+
+var bookmarkFolderID = null;
+
 function switchToTab(tabInfo) {
   var focusTab = function() {
     chrome.tabs.update(tabInfo.id, {active: true});
@@ -19,6 +23,24 @@ function switchToTab(tabInfo) {
     }
   });
 }
+
+function createOrGetBookmarkFolder() {
+  chrome.storage.sync.get('bookmarkFolderID', function(result) {
+    if (result.bookmarkFolderID) {
+      bookmarkFolderID = result.bookmarkFolderID;
+    }
+    else {
+      chrome.bookmarks.create({
+        title: "Quicksaved Tabs"
+      }, function(folder) {
+        bookmarkFolderID = folder.id;
+        chrome.storage.sync.set({bookmarkFolderID: folder.id});
+      });
+    }
+  });
+}
+
+createOrGetBookmarkFolder();
 
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
@@ -52,6 +74,21 @@ var SearchResultItems = React.createClass({
     return {
       focusedID: null
     };
+  },
+  bookmarkFocused: function() {
+    var tab = this.props.items[this.getFocusedItemIdx()];
+    chrome.bookmarks.create({
+      title: tab.title,
+      url: tab.url,
+      parentId: bookmarkFolderID
+    });
+  },
+  closeFocused: function() {
+    var focusedIdx = this.getFocusedItemIdx();
+    var focusedTabID = this.props.items[focusedIdx].id;
+    chrome.tabs.remove(focusedTabID, function() {
+      TabMagicMain.loadTabs([focusedTabID]);
+    });
   },
   getFocusedItemIdx: function() {
     for (var idx = 0; idx < this.props.items.length; idx++) {
@@ -184,6 +221,19 @@ var SearchBox = React.createClass({
     if (e.key === 'Escape') {
       window.close();
     }
+    if (e.metaKey) {
+      switch (e.keyCode) {
+        // Meta+C
+        case 67:
+          this.refs.items.closeFocused();
+          break;
+        // Meta+B
+        case 66:
+          this.refs.items.bookmarkFocused();
+          this.refs.items.closeFocused();
+          break;
+      }
+    }
   },
   render: function() {
     return React.createElement('div', {}, [
@@ -211,7 +261,20 @@ var TabMagic = React.createClass({
     };
   },
   componentDidMount: function() {
+    this.loadTabs();
+  },
+  // HACK: Sometimes chrome.tabs.query returns tabs we already called
+  // chrome.tabs.remove on, even after the callback!
+  // `withoutIDs` is an optional list of tab IDs that should be missing. If any
+  // are present, loadTabs calls itself again in 50ms to sync up again.
+  loadTabs: function(withoutIDs) {
     chrome.tabs.query({}, function(tabs) {
+      withoutIDs = withoutIDs || [];
+      var res = tabs.filter(function(tab) { return withoutIDs.indexOf(tab.id) !== -1 });
+      if (res.length !== 0) {
+        setTimeout(this.loadTabs.bind(this, withoutIDs), 50);
+        return;
+      }
       this.setState({
         items: tabs,
         loaded: true
@@ -228,4 +291,5 @@ var TabMagic = React.createClass({
   }
 });
 
-React.render(React.createElement(TabMagic, {}, []), document.getElementById('main_container'));
+var TabMagicEl = React.createElement(TabMagic, {}, []);
+TabMagicMain = React.render(TabMagicEl, document.getElementById('main_container'));

@@ -28,7 +28,8 @@
     },
     "permissions": [
         "tabs",
-        "history",
+        "bookmarks",
+        "storage",
         "http://*/*",
         "https://*/*"
     ],
