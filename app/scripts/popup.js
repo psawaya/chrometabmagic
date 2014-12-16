@@ -6,6 +6,8 @@ var $ = window.$;
 
 var TabMagicMain = null;
 
+var bookmarkFolderID = null;
+
 function switchToTab(tabInfo) {
   var focusTab = function() {
     chrome.tabs.update(tabInfo.id, {active: true});
@@ -21,6 +23,24 @@ function switchToTab(tabInfo) {
     }
   });
 }
+
+function createOrGetBookmarkFolder() {
+  chrome.storage.sync.get('bookmarkFolderID', function(result) {
+    if (result.bookmarkFolderID) {
+      bookmarkFolderID = result.bookmarkFolderID;
+    }
+    else {
+      chrome.bookmarks.create({
+        title: "Quicksaved Tabs"
+      }, function(folder) {
+        bookmarkFolderID = folder.id;
+        chrome.storage.sync.set({bookmarkFolderID: folder.id});
+      });
+    }
+  });
+}
+
+createOrGetBookmarkFolder();
 
 var SearchResultItem = React.createClass({
   displayName: 'SearchResultItem',
@@ -54,6 +74,14 @@ var SearchResultItems = React.createClass({
     return {
       focusedID: null
     };
+  },
+  bookmarkFocused: function() {
+    var tab = this.props.items[this.getFocusedItemIdx()];
+    chrome.bookmarks.create({
+      title: tab.title,
+      url: tab.url,
+      parentId: bookmarkFolderID
+    });
   },
   closeFocused: function() {
     var focusedIdx = this.getFocusedItemIdx();
@@ -199,9 +227,10 @@ var SearchBox = React.createClass({
         case 67:
           this.refs.items.closeFocused();
           break;
-        // Meta+D
-        case 68:
-          // TODO: Bookmark
+        // Meta+B
+        case 66:
+          this.refs.items.bookmarkFocused();
+          this.refs.items.closeFocused();
           break;
       }
     }
