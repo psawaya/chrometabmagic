@@ -87,9 +87,15 @@ var SearchResultItems = React.createClass({
   closeFocused: function() {
     var focusedIdx = this.getFocusedItemIdx();
     var focusedTabID = this.props.items[focusedIdx].id;
+    var nextTab = this.props.items[focusedIdx+1];
     chrome.tabs.remove(focusedTabID, function() {
-      TabMagicMain.loadTabs([focusedTabID]);
-    });
+      TabMagicMain.loadTabs([focusedTabID], function() {
+        // If we can, advance to select the next tab.
+        if (nextTab) {
+          this.selectItemByID(nextTab.id);
+        }
+      }.bind(this));
+    }.bind(this));
   },
   getFocusedItemIdx: function() {
     for (var idx = 0; idx < this.props.items.length; idx++) {
@@ -269,18 +275,19 @@ var TabMagic = React.createClass({
   // chrome.tabs.remove on, even after the callback!
   // `withoutIDs` is an optional list of tab IDs that should be missing. If any
   // are present, loadTabs calls itself again in 50ms to sync up again.
-  loadTabs: function(withoutIDs) {
+  loadTabs: function(withoutIDs, callback) {
+    callback = callback || function(){};
     chrome.tabs.query({}, function(tabs) {
       withoutIDs = withoutIDs || [];
       var res = tabs.filter(function(tab) { return withoutIDs.indexOf(tab.id) !== -1; });
       if (res.length !== 0) {
-        setTimeout(this.loadTabs.bind(this, withoutIDs), 50);
+        setTimeout(this.loadTabs.bind(this, withoutIDs, callback), 50);
         return;
       }
       this.setState({
         items: tabs,
         loaded: true
-      });
+      }, callback);
     }.bind(this));
   },
   render: function() {
