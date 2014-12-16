@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "ChromeTabMagic",
+    "message": "Tab Navigator",
     "description": "The name of the application"
   },
   "appDescription": {
-    "message": "Magic with tabs.",
+    "message": "A better way to work with browser tabs.",
     "description": "The description of the application"
   }
 }

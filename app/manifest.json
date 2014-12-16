@@ -19,7 +19,7 @@
             "19": "images/icon-19.png",
             "38": "images/icon-38.png"
         },
-        "default_title": "ChromeTabMagic",
+        "default_title": "Tab Navigator",
         "default_popup": "popup.html"
     },
     "options_page": "options.html",
