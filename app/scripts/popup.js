@@ -105,35 +105,44 @@ var SearchResultItems = React.createClass({
     }
     return null;
   },
-  // `dir` is 1 if we want to move the focused element down, and -1 if we want
-  // to move it up.
+  // `dir` is the number of tabs to navigate up/down. Can be positive or
+  // negative.
   moveFocused: function(dir) {
     var focusedIdx = this.getFocusedItemIdx();
+    var newFocusIdx = focusedIdx + dir;
     // If we haven't focused anything, or if the item we've focused is no
     // longer in list.
     if (this.state.focusedID === null || focusedIdx === null) {
       // ...and the direction is down, the first item is what we want.
-      if (dir === 1) {
-        this.selectItemByID(this.props.items[0].id);
+      if (dir > 0) {
+        this.focusFirst();
       }
       // ...and the direction is up, the first item is what we want.
-      else if (dir === -1) {
-        this.selectItemByID(this.props.items[this.props.items.length-1].id);
+      else if (dir < 0) {
+        this.focusLast();
       }
       return;
     }
-    if (dir === 1) {
-      if (focusedIdx >= this.props.items.length-1) {
-        return;
-      }
-      this.selectItemByID(this.props.items[focusedIdx+1].id);
+    if (newFocusIdx > this.props.items.length-1) {
+      this.focusLast();
     }
-    else if (dir === -1) {
-      if (focusedIdx === 0) {
-        return;
-      }
-      this.selectItemByID(this.props.items[focusedIdx-1].id);
+    else if (newFocusIdx < 0) {
+      this.focusFirst();
     }
+    else {
+      this.focusByIdx(newFocusIdx);
+    }
+  },
+  focusByIdx: function(idx) {
+    if (this.props.items[idx]) {
+      this.selectItemByID(this.props.items[idx].id);
+    }
+  },
+  focusFirst: function() {
+    this.focusByIdx(0);
+  },
+  focusLast: function() {
+    this.focusByIdx(this.props.items.length-1);
   },
   openFocused: function() {
     var focusedIdx = this.getFocusedItemIdx();
@@ -218,10 +227,32 @@ var SearchBox = React.createClass({
   },
   onKeyDown: function(e) {
     if (e.key === 'ArrowDown') {
-      this.refs.items.moveFocused(1);
+      if (e.metaKey) {
+        this.refs.items.focusLast();
+      }
+      else {
+        this.refs.items.moveFocused(1);
+      }
     }
     if (e.key === 'ArrowUp') {
-      this.refs.items.moveFocused(-1);
+      if (e.metaKey) {
+        this.refs.items.focusFirst();
+      }
+      else {
+        this.refs.items.moveFocused(-1);
+      }
+    }
+    if (e.key === 'PageDown') {
+      this.refs.items.moveFocused(13);
+    }
+    if (e.key === 'PageUp') {
+      this.refs.items.moveFocused(-13);
+    }
+    if (e.key === 'Home') {
+      this.refs.items.focusFirst();
+    }
+    if (e.key === 'End') {
+      this.refs.items.focusLast();
     }
     if (e.key === 'Enter') {
       this.refs.items.openFocused();
