@@ -264,7 +264,12 @@ var SearchBox = React.createClass({
       this.refs.items.openFocused();
     }
     if (e.key === 'Escape') {
-      window.close();
+      if (this.state.filterText !== '') {
+        this.setState({filterText: ''});
+      }
+      else {
+        window.close();
+      }
     }
     if (e.metaKey) {
       switch (e.keyCode) {
