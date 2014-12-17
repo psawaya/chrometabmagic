@@ -47,6 +47,9 @@ var SearchResultItem = React.createClass({
   onClick: function() {
     switchToTab(this.props.item);
   },
+  onMouseOver: function() {
+    this.props.parent.selectItemByID(this.props.item.id, true);
+  },
   render: function() {
     var cx = React.addons.classSet;
     var ret = React.createElement('li', {
@@ -55,6 +58,7 @@ var SearchResultItem = React.createClass({
         'tab-result-item': true,
         'active': this.props.focused
       }),
+      onMouseEnter: this.onMouseOver,
       onClick: this.onClick
     }, [
       React.createElement('img', {
@@ -151,12 +155,13 @@ var SearchResultItems = React.createClass({
     }
     switchToTab(this.props.items[focusedIdx]);
   },
-  selectItemByID: function(itemID) {
+  selectItemByID: function(itemID, dontScroll) {
+    var afterSetState = dontScroll ? function(){} : this.scrollToFocused;
     // After this.state.focusedID is updated, scroll the pane to the
     // corresponding element.
     this.setState({
       focusedID: itemID
-    }, this.scrollToFocused);
+    }, afterSetState);
   },
   scrollToFocused: function() {
     // Stop any current animations
@@ -175,7 +180,8 @@ var SearchResultItems = React.createClass({
       var itemProps = {
         item: item,
         key: item.id,
-        focused: this.state.focusedID === item.id
+        focused: this.state.focusedID === item.id,
+        parent: this
       };
       if (itemProps.focused) {
         itemProps.ref = 'focusedElement';
