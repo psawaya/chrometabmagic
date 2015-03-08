@@ -260,6 +260,9 @@ var SearchBox = React.createClass({
     if (e.key === 'End') {
       this.refs.items.focusLast();
     }
+    if (e.key === 'Delete') {
+      this.refs.items.closeFocused();
+    }
     if (e.key === 'Enter') {
       this.refs.items.openFocused();
     }
