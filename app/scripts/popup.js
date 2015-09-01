@@ -295,12 +295,14 @@ var SearchBox = React.createClass({
           handleChange: this.filterTextChange,
           handleKeyDown: this.onKeyDown
         })
-      ),
-        React.createElement(SearchResultItems, {
-          items: this.props.items.filter(this.showItem),
-          ref: 'items',
-          key: 'items'
-        })
+      ), [
+          React.createElement(SearchResultItems, {
+            items: this.props.items.filter(this.showItem),
+            ref: 'items',
+            key: 'items'
+          }),
+          React.createElement('span', {key: 'num_items'}, this.props.items.length)
+        ]
       ]);
   }
 });
